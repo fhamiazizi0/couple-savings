@@ -5,6 +5,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#fff5f8">
+  <link rel="manifest" href="/couple-savings/manifest.json">
+<link rel="apple-touch-icon" href="/couple-savings/icon-192.png">
 <title>CoupleSavings - Fahmi & Dina</title>
 
 <style>
@@ -576,5 +578,13 @@ $("logoutButton").addEventListener("click", async () => {
 });
 
 </script>
+  <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/couple-savings/sw.js")
+      .catch(error => console.error("Service Worker:", error));
+  });
+}
+  </script>
 </body>
 </html>
