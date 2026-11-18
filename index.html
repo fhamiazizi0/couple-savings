@@ -1,0 +1,580 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#fff5f8">
+<title>CoupleSavings - Fahmi & Dina</title>
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Arial, sans-serif;
+  background: #fff5f8;
+  color: #493542;
+  padding-bottom: 30px;
+}
+
+header {
+  padding: 24px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 { color: #a84f76; font-size: 23px; }
+header p { color: #987b89; font-size: 12px; margin-top: 5px; }
+
+.container { max-width: 480px; margin: auto; padding: 10px 18px; }
+
+.card {
+  background: white;
+  border-radius: 18px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 15px #d9a8bb22;
+}
+
+.balance {
+  background: linear-gradient(135deg,#bd648a,#df9bb4);
+  color: white;
+}
+
+.amount { font-size: 30px; font-weight: bold; margin: 12px 0; }
+.small { font-size: 12px; color: #987b89; }
+.balance .small { color: white; opacity: .9; }
+
+.progress-bg {
+  height: 10px;
+  background: #ffffff55;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.progress {
+  height: 100%;
+  background: white;
+  width: 0%;
+  border-radius: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  background: white;
+  padding: 16px;
+  border-radius: 15px;
+}
+
+.stat p { color: #987b89; font-size: 12px; margin-bottom: 9px; }
+.stat h3 { color: #a84f76; font-size: 17px; overflow-wrap: anywhere; }
+
+h2 { font-size: 16px; margin-bottom: 14px; }
+
+input, select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ead5df;
+  border-radius: 10px;
+  margin: 7px 0 13px;
+  font-size: 14px;
+  background: white;
+  color: #493542;
+}
+
+label { font-size: 13px; font-weight: bold; }
+
+button {
+  border: none;
+  padding: 13px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.primary { background: #b75c82; color: white; width: 100%; }
+.secondary { background: #f6e5ec; color: #a84f76; }
+.logout { background: #f6e5ec; color: #a84f76; padding: 9px 13px; }
+
+.actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 13px 0;
+  border-bottom: 1px solid #f3e7ec;
+}
+
+.history-item:last-child { border: none; }
+.history-item p { font-size: 13px; }
+.history-item small { font-size: 11px; color: #987b89; }
+.plus { color: #299b72; font-weight: bold; }
+.minus { color: #d45d69; font-weight: bold; }
+
+.empty { text-align: center; padding: 18px; color: #987b89; font-size: 13px; }
+
+#appSection, #transactionForm { display: none; }
+
+#message {
+  background: #fff0f0;
+  color: #a33;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 12px;
+  display: none;
+  overflow-wrap: anywhere;
+}
+
+#loginSection { max-width: 480px; margin: auto; padding: 10px 18px; }
+
+footer { text-align: center; color: #ad8b9b; font-size: 11px; padding: 15px; }
+</style>
+</head>
+
+<body>
+
+<header>
+  <div>
+    <h1>Fahmi & Dina ♡</h1>
+    <p>Our Savings • Private Couple Account</p>
+  </div>
+  <div>💕</div>
+</header>
+
+<div id="loginSection">
+  <section class="card">
+    <h2>Selamat datang ♡</h2>
+    <p class="small">Masuk ke akun CoupleSavings milikmu.</p>
+
+    <div id="message"></div>
+
+    <form id="loginForm">
+      <label>Email</label>
+      <input id="email" type="email" placeholder="Masukkan email" required autocomplete="username">
+
+      <label>Password</label>
+      <input id="password" type="password" placeholder="Masukkan password" required autocomplete="current-password">
+
+      <button class="primary" id="loginButton" type="submit">Masuk</button>
+    </form>
+  </section>
+</div>
+
+<div id="appSection" class="container">
+
+  <section class="card">
+    <p class="small">Selamat datang,</p>
+    <h2 id="userName" style="margin-top:7px">Fahmi</h2>
+    <p class="small" id="userRole">Pemilik akun</p>
+    <button class="logout" id="logoutButton" style="margin-top:12px">Keluar akun</button>
+  </section>
+
+  <section class="card balance">
+    <p class="small">Total tabungan bersama</p>
+    <div class="amount" id="balance">Rp0</div>
+    <p class="small">Target: <span id="targetLabel">Rp10.000.000</span></p>
+    <div class="progress-bg">
+      <div class="progress" id="progress"></div>
+    </div>
+    <p class="small" id="progressText">0% tercapai</p>
+  </section>
+
+  <section class="grid">
+    <div class="stat">
+      <p>Tabungan Fahmi</p>
+      <h3 id="fahmiBalance">Rp0</h3>
+    </div>
+    <div class="stat">
+      <p>Tabungan Dina</p>
+      <h3 id="dinaBalance">Rp0</h3>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Kelola tabungan</h2>
+    <div class="actions">
+      <button class="primary" onclick="showForm('masuk')">+ Tambah uang</button>
+      <button class="secondary" onclick="showForm('keluar')">− Tarik uang</button>
+    </div>
+  </section>
+
+  <section class="card" id="transactionForm">
+    <h2 id="formTitle">Tambah transaksi</h2>
+
+    <form id="moneyForm">
+      <label>Jenis transaksi</label>
+      <select id="type">
+        <option value="masuk">Uang masuk</option>
+        <option value="keluar">Uang keluar</option>
+      </select>
+
+      <label>Nama pengguna</label>
+      <input id="person" readonly>
+
+      <label>Nominal (Rp)</label>
+      <input id="amount" type="number" min="1" step="1" placeholder="Contoh: 100000" required>
+
+      <label>Keterangan</label>
+      <input id="note" type="text" maxlength="80" placeholder="Contoh: Tabungan bulanan">
+
+      <button class="primary" id="saveButton" type="submit">Simpan transaksi</button>
+    </form>
+  </section>
+
+  <section class="card" id="targetSection">
+    <h2>Target tabungan</h2>
+    <p class="small">Hanya Fahmi yang dapat mengubah target.</p>
+    <div id="targetEditor">
+      <input id="targetInput" type="number" min="1" step="1" placeholder="Target baru">
+      <button class="primary" id="targetButton">Perbarui target</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Riwayat transaksi</h2>
+    <div id="history"><p class="empty">Memuat transaksi...</p></div>
+  </section>
+
+</div>
+
+<footer>Made with love ♡ Fahmi & Dina</footer>
+
+<script type="module">
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/13.4.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD-MQXsfl4nD_ANsUXJCVN2n_T6FRPZJPc",
+  authDomain: "couple-savings-fahmi-dina.firebaseapp.com",
+  projectId: "couple-savings-fahmi-dina",
+  storageBucket: "couple-savings-fahmi-dina.firebasestorage.app",
+  messagingSenderId: "660137884416",
+  appId: "1:660137884416:web:d37cc7b1ef70905b4c11e5"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const FAHMI_UID = "57DWZmFSpCc4ERyF9vss3qlBBch1";
+const DINA_UID = "LRBADHNFhxVmadyeV8ciIk46Djj2";
+
+const coupleRef = doc(db, "couples", "fahmi-dina");
+const settingsRef = doc(db, "couples", "fahmi-dina", "settings", "main");
+const transactionsRef = collection(db, "couples", "fahmi-dina", "transactions");
+
+let currentUser = null;
+let currentName = "";
+let transactions = [];
+let target = 10000000;
+let stopTransactions = null;
+let stopSettings = null;
+
+const $ = id => document.getElementById(id);
+
+function rupiah(value) {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0
+  }).format(value);
+}
+
+function showMessage(message) {
+  $("message").textContent = message;
+  $("message").style.display = "block";
+}
+
+function hideMessage() {
+  $("message").style.display = "none";
+}
+
+function totalBalance() {
+  return transactions.reduce((sum, t) =>
+    sum + (t.type === "masuk" ? t.amount : -t.amount), 0
+  );
+}
+
+function personBalance(name) {
+  return transactions.reduce((sum, t) => {
+    if (t.person !== name) return sum;
+    return sum + (t.type === "masuk" ? t.amount : -t.amount);
+  }, 0);
+}
+
+function render() {
+  const balance = totalBalance();
+  const percentage = Math.max(0, Math.min(100, balance / target * 100));
+
+  $("balance").textContent = rupiah(balance);
+  $("targetLabel").textContent = rupiah(target);
+  $("fahmiBalance").textContent = rupiah(personBalance("Fahmi"));
+  $("dinaBalance").textContent = rupiah(personBalance("Dina"));
+  $("progress").style.width = percentage + "%";
+  $("progressText").textContent = percentage.toFixed(1) + "% tercapai";
+
+  const history = $("history");
+  history.replaceChildren();
+
+  if (transactions.length === 0) {
+    const empty = document.createElement("p");
+    empty.className = "empty";
+    empty.textContent = "Belum ada transaksi ♡";
+    history.appendChild(empty);
+    return;
+  }
+
+  transactions.forEach(t => {
+    const item = document.createElement("div");
+    item.className = "history-item";
+
+    const left = document.createElement("div");
+    const title = document.createElement("p");
+    title.textContent = t.person + " • " +
+      (t.type === "masuk" ? "Uang masuk" : "Uang keluar");
+
+    const note = document.createElement("small");
+    note.textContent = t.note || "Tanpa keterangan";
+
+    const date = document.createElement("small");
+    const dateValue = t.createdAt?.toDate?.();
+    date.textContent = dateValue
+      ? " • " + dateValue.toLocaleString("id-ID")
+      : " • Baru saja";
+
+    left.append(title, note, date);
+
+    const amount = document.createElement("strong");
+    amount.className = t.type === "masuk" ? "plus" : "minus";
+    amount.textContent =
+      (t.type === "masuk" ? "+" : "-") + rupiah(t.amount);
+
+    item.append(left, amount);
+    history.appendChild(item);
+  });
+}
+
+function cleanupListeners() {
+  if (stopTransactions) stopTransactions();
+  if (stopSettings) stopSettings();
+  stopTransactions = null;
+  stopSettings = null;
+}
+
+async function initializeAccount(user) {
+  if (user.uid === FAHMI_UID) {
+    currentName = "Fahmi";
+    $("userRole").textContent = "Pemilik utama";
+    $("targetEditor").style.display = "block";
+  } else if (user.uid === DINA_UID) {
+    currentName = "Dina";
+    $("userRole").textContent = "Pasangan";
+    $("targetEditor").style.display = "none";
+  } else {
+    await signOut(auth);
+    showMessage("Akun ini tidak memiliki akses CoupleSavings.");
+    return;
+  }
+
+  currentUser = user;
+
+  $("userName").textContent = currentName;
+  $("person").value = currentName;
+
+  $("loginSection").style.display = "none";
+  $("appSection").style.display = "block";
+  hideMessage();
+
+  if (currentName === "Fahmi") {
+    const settingsSnap = await getDoc(settingsRef);
+
+    if (!settingsSnap.exists()) {
+      await setDoc(settingsRef, {
+        target: 10000000
+      });
+    }
+  }
+
+  stopSettings = onSnapshot(settingsRef, snapshot => {
+    if (snapshot.exists()) {
+      const value = snapshot.data().target;
+      if (Number.isSafeInteger(value) && value > 0) {
+        target = value;
+      }
+    }
+    render();
+  }, error => showMessage("Gagal membaca pengaturan: " + error.message));
+
+  const transactionQuery = query(
+    transactionsRef,
+    orderBy("createdAt", "desc")
+  );
+
+  stopTransactions = onSnapshot(transactionQuery, snapshot => {
+    transactions = snapshot.docs.map(d => ({
+      id: d.id,
+      ...d.data()
+    }));
+    render();
+  }, error => showMessage("Gagal membaca transaksi: " + error.message));
+}
+
+$("loginForm").addEventListener("submit", async event => {
+  event.preventDefault();
+  hideMessage();
+
+  $("loginButton").disabled = true;
+  $("loginButton").textContent = "Memeriksa akun...";
+
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      $("email").value.trim(),
+      $("password").value
+    );
+  } catch (error) {
+    showMessage("Login gagal: " + error.message);
+  } finally {
+    $("loginButton").disabled = false;
+    $("loginButton").textContent = "Masuk";
+  }
+});
+
+onAuthStateChanged(auth, async user => {
+  cleanupListeners();
+
+  if (!user) {
+    currentUser = null;
+    currentName = "";
+    transactions = [];
+    target = 10000000;
+    $("appSection").style.display = "none";
+    $("loginSection").style.display = "block";
+    render();
+    return;
+  }
+
+  try {
+    await initializeAccount(user);
+  } catch (error) {
+    showMessage("Gagal memuat akun: " + error.message);
+  }
+});
+
+window.showForm = type => {
+  $("transactionForm").style.display = "block";
+  $("type").value = type;
+  $("formTitle").textContent =
+    type === "masuk" ? "Tambah uang ♡" : "Tarik uang";
+
+  $("transactionForm").scrollIntoView({ behavior: "smooth" });
+};
+
+$("moneyForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  if (!currentUser) return;
+
+  const type = $("type").value;
+  const amount = Number($("amount").value);
+  const note = $("note").value.trim();
+
+  if (!Number.isSafeInteger(amount) || amount <= 0) {
+    alert("Masukkan nominal yang valid.");
+    return;
+  }
+
+  if (type === "keluar" && amount > personBalance(currentName)) {
+    alert("Saldo pribadi tidak mencukupi.");
+    return;
+  }
+
+  if (type === "keluar" && amount > totalBalance()) {
+    alert("Saldo bersama tidak mencukupi.");
+    return;
+  }
+
+  $("saveButton").disabled = true;
+
+  try {
+    await addDoc(transactionsRef, {
+      type,
+      person: currentName,
+      amount,
+      note,
+      createdAt: serverTimestamp()
+    });
+
+    $("moneyForm").reset();
+    $("person").value = currentName;
+    $("transactionForm").style.display = "none";
+    alert("Transaksi berhasil disimpan!");
+  } catch (error) {
+    alert("Gagal menyimpan transaksi: " + error.message);
+  } finally {
+    $("saveButton").disabled = false;
+  }
+});
+
+$("targetButton").addEventListener("click", async () => {
+  if (currentUser?.uid !== FAHMI_UID) return;
+
+  const value = Number($("targetInput").value);
+
+  if (!Number.isSafeInteger(value) || value <= 0) {
+    alert("Masukkan target yang valid.");
+    return;
+  }
+
+  $("targetButton").disabled = true;
+
+  try {
+    await setDoc(settingsRef, { target: value }, { merge: true });
+    $("targetInput").value = "";
+    alert("Target berhasil diperbarui!");
+  } catch (error) {
+    alert("Gagal mengubah target: " + error.message);
+  } finally {
+    $("targetButton").disabled = false;
+  }
+});
+
+$("logoutButton").addEventListener("click", async () => {
+  cleanupListeners();
+  await signOut(auth);
+});
+
+</script>
+</body>
+</html>
